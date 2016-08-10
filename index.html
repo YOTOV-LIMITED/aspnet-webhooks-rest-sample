@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Aspnet-webhooks-rest-sample by YOTOV-LIMITED</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Aspnet-webhooks-rest-sample</h1>
+      <h2 class="project-tagline">Webhooks in Microsoft Graph notify your web application about changes in user data. You can create a webhook subscription to get notified about changes in Office 365 data.</h2>
+      <a href="https://github.com/YOTOV-LIMITED/aspnet-webhooks-rest-sample" class="btn">View on GitHub</a>
+      <a href="https://github.com/YOTOV-LIMITED/aspnet-webhooks-rest-sample/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/YOTOV-LIMITED/aspnet-webhooks-rest-sample/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="microsoft-graph-aspnet-webhooks" class="anchor" href="#microsoft-graph-aspnet-webhooks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Microsoft Graph ASP.NET Webhooks</h1>
+
+<p>Subscribe for webhooks to get notified when your user's data changes so you don't have to poll for changes.</p>
+
+<p>This ASP.NET MVC sample shows how to start getting notifications from Microsoft Graph. <a href="http://graph.microsoft.io/">Microsoft Graph</a> provides a unified API endpoint to access data from the Microsoft cloud.</p>
+
+<p>The following are common tasks that a web application performs with Microsoft Graph webhooks.</p>
+
+<ul>
+<li>Sign-in your users with their work or school account to get an access token.</li>
+<li>Use the access token to create a webhook <a href="http://graph.microsoft.io/en-us/docs/api-reference/v1.0/resources/subscription">subscription</a>.</li>
+<li>Send back a validation token to confirm the notification URL.</li>
+<li>Listen for notifications from Microsoft Graph.</li>
+<li>Request for more information in Microsoft Office 365 using data in the notification.</li>
+</ul>
+
+<p><img src="/readme-images/Page1.PNG" alt="Microsoft Graph Webhook Sample for ASP.NET screenshot"></p>
+
+<p>The previous screenshot shows the app's start page. After the app creates a subscription on behalf of the signed-in user, Microsoft Graph sends a notification to the registered endpoint when events happen in the user's data. The app then reacts to the event.</p>
+
+<p>This sample subscribes to the <code>me/mailFolders('Inbox')/messages</code> resource for <code>created</code> changes. It gets notified when the user receives a mail message, and then updates a page with information about the message. </p>
+
+<h2>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Prerequisites</h2>
+
+<p>To use the Microsoft Graph ASP.NET Webhooks sample, you need the following:</p>
+
+<ul>
+<li><p>Visual Studio 2015 installed on your development computer. </p></li>
+<li><p>A public HTTPS endpoint to receive and send HTTP requests. You can host this on Microsoft Azure or another service, or you can <a href="#ngrok">use ngrok</a> or a similar tool while testing.</p></li>
+<li>
+<p>The client ID and key from the application that you registered on a Microsoft Azure tenant. Use the <a href="http://dev.office.com/app-registration">Office 365 app registration tool</a> to quickly register an app with the following parameters:</p>
+
+<table>
+<thead>
+<tr>
+<th align="right">Parameter</th>
+<th align="left">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">App name</td>
+<td align="left">&lt;any name&gt;</td>
+</tr>
+<tr>
+<td align="right">App type</td>
+<td align="left">Web App</td>
+</tr>
+<tr>
+<td align="right">Sign on URL</td>
+<td align="left">https://localhost:44300/</td>
+</tr>
+<tr>
+<td align="right">Redirect URI</td>
+<td align="left">https://localhost:44300/</td>
+</tr>
+<tr>
+<td align="right">App permissions</td>
+<td align="left">Mail.Read</td>
+</tr>
+</tbody>
+</table>
+
+<p>Copy and store the returned <strong>Client ID</strong> and <strong>Client Secret</strong> values. (Learn more about <a href="https://msdn.microsoft.com/office/office365/howto/setup-development-environment?aspnet">setting up your development environment</a>.)</p>
+</li>
+</ul>
+
+<p><a name="ngrok"></a></p>
+
+<h3>
+<a id="set-up-the-ngrok-proxy-optional" class="anchor" href="#set-up-the-ngrok-proxy-optional" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Set up the ngrok proxy (optional)</h3>
+
+<p>You must expose a public HTTPS endpoint to create a subscription and receive notifications from Microsoft Graph. While testing, you can use ngrok to temporarily allow messages from Microsoft Graph to tunnel to a <em>localhost</em> port on your computer. To learn more about using ngrok, see the <a href="https://ngrok.com/">ngrok website</a>.  </p>
+
+<ol>
+<li><p>In Solution Explorer, select the <strong>GraphWebhooks</strong> project.</p></li>
+<li>
+<p>Copy the <strong>URL</strong> port number from the <strong>Properties</strong> window.  If the <strong>Properties</strong> window isn't showing, choose <strong>View &gt; Properties Window</strong>. </p>
+
+<p><img src="readme-images/PortNumber.png" alt="The URL port number in the Properties window"></p>
+</li>
+<li><p><a href="https://ngrok.com/download">Download ngrok</a> for Windows.  </p></li>
+<li><p>Unzip the package and run ngrok.exe.</p></li>
+<li>
+<p>Replace the two <em>&lt;port-number&gt;</em> placeholder values in the following command with the port number you copied, and then run the command in the ngrok console.</p>
+
+<pre><code>ngrok http &lt;port-number&gt; -host-header=localhost:&lt;port-number&gt;
+</code></pre>
+
+<p><img src="readme-images/ngrok1.PNG" alt="Example command to run in the ngrok console"></p>
+</li>
+<li>
+<p>Copy the HTTPS URL that's shown in the console. You'll use this to configure your notification URL in the sample.</p>
+
+<p><img src="readme-images/ngrok2.PNG" alt="The forwarding HTTPS URL in the ngrok console"></p>
+
+<blockquote>
+<p>Keep the console open while testing. If you close it, the tunnel also closes and you'll need to generate a new URL and update the sample.</p>
+</blockquote>
+</li>
+</ol>
+
+<p>See <a href="https://github.com/OfficeDev/Microsoft-Graph-Nodejs-Webhooks/wiki/Hosting-the-sample-without-a-tunnel">Hosting without a tunnel</a> and <a href="https://github.com/OfficeDev/Microsoft-Graph-Nodejs-Webhooks/wiki/Why-do-I-have-to-use-a-tunnel">Why do I have to use a tunnel?</a> for more information.</p>
+
+<h2>
+<a id="configure-and-run-the-sample" class="anchor" href="#configure-and-run-the-sample" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configure and run the sample</h2>
+
+<ol>
+<li><p>Expose a public HTTPS notification endpoint. It can run on a service such as Microsoft Azure, or you can create a proxy web server by <a href="#ngrok">using ngrok</a> or a similar tool.</p></li>
+<li>
+<p>Open <strong>GraphWebhooks.sln</strong> in the sample files. </p>
+
+<blockquote>
+<p>You may be prompted to trust certificates for localhost.</p>
+</blockquote>
+</li>
+<li>
+<p>In Solution Explorer, open the <strong>Web.config</strong> file in the root directory of the project.<br>
+a. For the <strong>ClientId</strong> key, replace <em>ENTER_YOUR_CLIENT_ID</em> with the client ID of your registered Azure application.  </p>
+
+<p>b. For the <strong>ClientSecret</strong> key, replace <em>ENTER_YOUR_SECRET</em> with the key of your registered Azure application.  </p>
+
+<p>c. For the <strong>NotificationUrl</strong> key, replace <em>ENTER_YOUR_URL</em> with the HTTPS URL. Keep the <em>/notification/listen</em> portion. If you're using ngrok, use the HTTPS URL that you copied. The value will look something like this:</p>
+
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">add</span> <span class="pl-e">key</span>=<span class="pl-s"><span class="pl-pds">"</span>ida:NotificationUrl<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>https://0f6fd138.ngrok.io/notification/listen<span class="pl-pds">"</span></span> /&gt;</pre></div>
+</li>
+<li><p>Make sure that the ngrok console is still running, then press F5 to build and run the solution in debug mode. </p></li>
+</ol>
+
+<h3>
+<a id="use-the-app" class="anchor" href="#use-the-app" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Use the app</h3>
+
+<ol>
+<li><p>Sign in with your Office 365 work or school account. </p></li>
+<li>
+<p>Choose the <strong>Create subscription</strong> button. The <strong>Subscription</strong> page loads with information about the subscription.</p>
+
+<p><img src="readme-images/Page2.PNG" alt="App page showing properties of the new subscription"></p>
+</li>
+<li><p>Choose the <strong>Watch for notifications</strong> button.</p></li>
+<li>
+<p>Send an email to your Office 365 account. The <strong>Notification</strong> page displays some message properties. It may take several seconds for the page to update.</p>
+
+<p><img src="readme-images/Page3.PNG" alt="App page showing properties of the new message"></p>
+</li>
+<li><p>Choose the <strong>Delete subscription and sign out</strong> button. </p></li>
+</ol>
+
+<h2>
+<a id="key-components-of-the-sample" class="anchor" href="#key-components-of-the-sample" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Key components of the sample</h2>
+
+<p><strong>Controllers</strong>  </p>
+
+<ul>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Controllers/NotificationController.cs"><code>NotificationController.cs</code></a> Receives notifications.<br>
+</li>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Controllers/SubscriptionController.cs"><code>SubscriptionContoller.cs</code></a> Creates and receives webhook subscriptions.</li>
+</ul>
+
+<p><strong>Models</strong>  </p>
+
+<ul>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Models/Message.cs"><code>Message.cs</code></a> Represents an Outlook mail message. </li>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Models/Notification.cs"><code>Notification.cs</code></a> Represents a change notification. </li>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Models/Subscription.cs"><code>Subscription.cs</code></a> Represents a webhook subscription. Also defines the <strong>SubscriptionViewModel</strong> that represents the data displayed in the Subscription view. </li>
+</ul>
+
+<p><strong>Views</strong>  </p>
+
+<ul>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Views/Notification/Notification.cshtml"><code>Notification/Notification.cshtml</code></a> Displays information about received messages, and contains the <strong>Delete subscription and sign out</strong> button. </li>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Views/Subscription/Index.cshtml"><code>Subscription/Index.cshtml</code></a> Landing page that contains the <strong>Create subscription</strong> button. </li>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Views/Subscription/Subscription.cshtml"><code>Subscription/Subscription.cshtml</code></a> Displays subscription properties, and contains the <strong>Watch for notifications</strong> button. </li>
+</ul>
+
+<p><strong>Other</strong>  </p>
+
+<ul>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Web.config"><code>Web.config</code></a> Contains values used for authentication and authorization. </li>
+<li>
+<a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/App_Start/Startup.Auth.cs"><code>Startup.Auth.cs</code></a> and <a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/blob/master/GraphWebhooks/Controllers/Utils/AuthHelper.cs"><code>Controllers/Utils/AuthHelper</code></a> Contain code used for authentication and authorization. The sample uses <a href="https://msdn.microsoft.com/en-us/library/azure/dn645541.aspx">OpenID Connect</a> and <a href="http://go.microsoft.com/fwlink?LinkId=258232">Active Directory Authentication Library .NET (v2)</a> to authenticate and authorize the user.</li>
+</ul>
+
+<h2>
+<a id="troubleshooting" class="anchor" href="#troubleshooting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Troubleshooting</h2>
+
+<table>
+<thead>
+<tr>
+<th align="left">Issue</th>
+<th align="left">Resolution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">The app opens to a <em>Server Error in '/' Application. The resource cannot be found.</em> browser page.</td>
+<td align="left">Make sure that a CSHTML view file isn't the active tab when you run the app from Visual Studio.</td>
+</tr>
+<tr>
+<td align="left">You're using ngrok and get a <em>Subscription validation request timed out</em> response.</td>
+<td align="left">Make sure that you used your project's HTTP port for the tunnel (not HTTPS).</td>
+</tr>
+</tbody>
+</table>
+
+<h2>
+<a id="questions-and-comments" class="anchor" href="#questions-and-comments" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Questions and comments</h2>
+
+<p>We'd love to get your feedback about the Microsoft Graph ASP.NET Webhooks sample. You can send your questions and suggestions to us in the <a href="https://github.com/OfficeDev/Microsoft-Graph-ASPNET-Webhooks/issues">Issues</a> section of this repository.</p>
+
+<p>Questions about Microsoft Graph in general should be posted to <a href="http://stackoverflow.com/questions/tagged/MicrosoftGraph">Stack Overflow</a>. Make sure that your questions or comments are tagged with <em>[MicrosoftGraph]</em>.</p>
+
+<p>You can suggest changes for Microsoft Graph on <a href="https://github.com/OfficeDev/microsoft-graph-docs">GitHub</a>.</p>
+
+<h2>
+<a id="additional-resources" class="anchor" href="#additional-resources" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Additional resources</h2>
+
+<ul>
+<li><a href="https://github.com/OfficeDev/Microsoft-Graph-Nodejs-Webhooks">Microsoft Graph Node.js Webhooks sample</a></li>
+<li><a href="http://graph.microsoft.io/en-us/docs/api-reference/v1.0/resources/subscription">Subscription resource</a></li>
+<li><a href="http://graph.microsoft.io/">Microsoft Graph documentation</a></li>
+<li><a href="https://graph.microsoft.io/en-us/docs/platform/aspnetmvc">Call Microsoft Graph in an ASP.NET MVC app</a></li>
+<li><a href="https://msdn.microsoft.com/office/office365/howto/setup-development-environment?aspnet">Set up your Office 365 development environment</a></li>
+</ul>
+
+<h2>
+<a id="copyright" class="anchor" href="#copyright" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Copyright</h2>
+
+<p>Copyright (c) 2016 Microsoft. All rights reserved.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/YOTOV-LIMITED/aspnet-webhooks-rest-sample">Aspnet-webhooks-rest-sample</a> is maintained by <a href="https://github.com/YOTOV-LIMITED">YOTOV-LIMITED</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
